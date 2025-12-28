@@ -1,7 +1,8 @@
 set(TARGET png_codec)
 
-add_executable(${TARGET}
-    src/png_codec.cpp
+add_library(${TARGET}
+        png_codec.cpp
 )
+target_link_libraries(${TARGET} PUBLIC base_codec)
 
-target_include_directories(${TARGET} PUBLIC src)
+target_include_directories(${TARGET} PUBLIC include)

@@ -56,3 +56,5 @@
 //} else {
 //Logger::debug() << "Failed to uncompress data from file: " << filename << std::endl;
 //}
+
+#include "include/png_codec.hpp"

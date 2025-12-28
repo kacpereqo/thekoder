@@ -83,7 +83,6 @@
 //    return os;
 //}
 
-
 int main(int argc, char* argv[]) {
     const std::string filename = "../zmitac.png";
 

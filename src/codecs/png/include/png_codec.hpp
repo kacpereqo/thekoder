@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "codecs/base/codec.hpp"
+#include "codec.hpp"
 
-class PngCodec {
+class PngCodec : Codec {
 
 };
