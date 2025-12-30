@@ -1,60 +1,99 @@
-////
-//// Created by remza on 28.12.2025.
-////
 //
-//#include "png_codec.hpp"
+// Created by remza on 28.12.2025.
 //
-//
-//if ( filestream.read(reinterpret_cast<char*>(image_data.data()), size)) {
-//
-//Logger::debug() << "Image data read from file: " << filename << std::endl;
-//
-//} else {
-//
-//Logger::debug() << "Failed to read image data from file: " << filename << std::endl;
-//std::exit(EXIT_FAILURE);
-//
-//}
-//
-//if (is_png(image_data_cursor))
-//Logger::debug() << "The file is a valid PNG image" << std::endl;
-//else
-//Logger::warning() << "The file is not a valid PNG image" << std::endl;
-//
-//Chunk chunk;
-//IHDRData hdr_data{};
-//GAMAData gama_data{};
-//PHYSData phys_data{};
-//IDATData idat_data{};
-//
-//while (chunk.chunk_type_str() != ChunkType::IEND) {
-//chunk = read_chunk(image_data_cursor);
-//
-//const auto chunk_type = chunk.chunk_type_str();
-//
-//if (chunk_type == ChunkType::IHDR) hdr_data = IHDRData{std::move(chunk)};
-//else if (chunk_type == ChunkType::SRGB) {}
-//else if (chunk_type == ChunkType::GAMA) gama_data = GAMAData{std::move(chunk)};
-//else if (chunk_type == ChunkType::PHYS) phys_data = PHYSData{std::move(chunk)};
-//else if (chunk_type == ChunkType::IDAT) idat_data = IDATData{std::move(chunk)};
-//else if (chunk_type == ChunkType::IEND) {}
-//else                                    {}
-//}
-//
-//uLongf vector_length = hdr_data.width * hdr_data.height * 3 + hdr_data.height;
-//
-//std::vector<uint8_t> pixels;
-//pixels.reserve(vector_length);
-//
-//auto result = uncompress(pixels.data(),
-//                         &vector_length,jakby
-//reinterpret_cast<Bytef*>(idat_data.compressed_data.data()),
-//idat_data.compressed_data.size());
-//
-//if (result == Z_OK) {
-//Logger::debug() << "Uncompressed data read from file: " << filename << std::endl;
-//} else {
-//Logger::debug() << "Failed to uncompress data from file: " << filename << std::endl;
-//}
 
 #include "include/png_codec.hpp"
+#include "include/constants.hpp"
+
+#include <memory>
+#include <zlib.h>
+
+struct ScanLine {
+    uint8_t filter;
+    uint8_t* r;
+    uint8_t* g;
+    uint8_t* b;
+};
+
+
+auto PngCodec::decode(std::byte *&cursor) -> std::vector<std::byte> {
+    Chunk chunk{};
+
+    while (chunk.chunk_type_str() != ChunkType::IEND) {
+        chunk = read_chunk(cursor);
+
+        Logger::debug() << chunk << std::endl;
+
+        const auto chunk_type = chunk.chunk_type_str();
+
+        if (chunk_type == ChunkType::IHDR) this->ihdr = IHDRData{std::move(chunk)};
+        else if (chunk_type == ChunkType::SRGB) {}
+        else if (chunk_type == ChunkType::GAMA) this->gama = GAMAData{std::move(chunk)};
+        else if (chunk_type == ChunkType::PHYS) this->phys = PHYSData{std::move(chunk)};
+        else if (chunk_type == ChunkType::IDAT) this->idat = IDATData{std::move(chunk)};
+        else if (chunk_type == ChunkType::IEND) {}
+        else                                    {}
+    }
+
+    const auto rgb_space = this->ihdr.width * this->ihdr.height * 3;
+    const auto filter_space = this->ihdr.height;
+
+
+    uLongf vector_length = rgb_space + filter_space;
+
+    std::vector<std::byte> pixels(vector_length);
+
+    const auto result = uncompress(
+        reinterpret_cast<Bytef *>(pixels.data()),
+        &vector_length,
+        reinterpret_cast<Bytef*>(idat.compressed_data.data()),
+    idat.compressed_data.size()
+    );
+
+    if (result != Z_OK) {
+        Logger::error() << result << std::endl;
+    }
+
+    return std::move(pixels);
+}
+
+auto PngCodec::decode_to_rgb(std::byte *&cursor) -> std::vector<ColorRGB>{
+    const std::vector<std::byte> decoded_data = std::move(this->decode(cursor));
+
+    const auto size = this->ihdr.width * this->ihdr.height;
+    std::vector<ColorRGB> pixels(size);
+
+    for (int row = 0; row < this->ihdr.height; row++) {
+        constexpr auto COLOR_SIZE = sizeof(ColorRGB);
+
+        const auto filter_idx = row * this->ihdr.width * COLOR_SIZE + row;
+        const auto filter = decoded_data[filter_idx];
+
+        for (int column = 0; column < this->ihdr.height; column++) {
+            const auto decoded_data_idx = (row * this->ihdr.width + column) * COLOR_SIZE + (row + 1);
+            const auto pixels_idx = row * ihdr.width + column;
+            const ColorRGB color {
+                decoded_data[decoded_data_idx + 0],
+                decoded_data[decoded_data_idx + 1],
+                decoded_data[decoded_data_idx + 2]};
+
+
+            pixels[pixels_idx] = color;
+        }
+    }
+
+    return std::move(pixels);
+}
+
+
+auto PngCodec::is_signature_valid(std::byte *&cursor) -> bool {
+    for (size_t i = 0; i < TheKoder::PNG::Constants::SIGNATURE.size(); ++i) {
+        if (cursor[i] != TheKoder::PNG::Constants::SIGNATURE[i]) {
+            return false;
+        }
+    }
+
+    cursor += TheKoder::PNG::Constants::SIGNATURE.size();
+
+    return true;
+}

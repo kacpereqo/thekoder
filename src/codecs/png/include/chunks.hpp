@@ -3,10 +3,38 @@
 //
 
 #pragma once
+
 #include <cstdint>
 #include <string_view>
 #include <array>
 #include <vector>
+#include <cstring>
+
+#include "logger.hpp"
+#include "constants.hpp"
+
+template <typename T>
+ T read_numerical_value(std::byte*& cursor) {
+    T value{};
+    std::memcpy(&value, cursor, sizeof(T));
+
+    cursor += sizeof(T);
+
+    value = std::byteswap(value);
+
+    return value;
+}
+
+template <typename T>
+ T read_array_value(std::byte*& cursor) {
+    T value{};
+    std::memcpy(&value, cursor, sizeof(T));
+
+    cursor += sizeof(T);
+
+    return value;
+}
+
 
 struct Chunk {
     uint32_t length{};
@@ -100,3 +128,34 @@ struct IDATData {
         compressed_data = std::move(chunk.data);
     }
 };
+
+inline std::vector<std::byte> read_bytes(std::byte*& cursor, const size_t n) {
+    std::vector<std::byte> result;
+    result.resize(n);
+    std::memcpy(result.data(), cursor, n);
+    cursor += n;
+
+    return result;
+}
+
+inline Chunk read_chunk(std::byte*& cursor) {
+    const auto length = read_numerical_value<uint32_t>(cursor);
+    const auto chunk_type = read_array_value<std::array<char,4>>(cursor);
+    const auto data = read_bytes(cursor, length);
+    const auto crc = read_array_value<std::array<std::byte,4>>(cursor);
+
+    return {length, chunk_type, data, crc};
+}
+
+inline std::ostream &operator<<(std::ostream& os, const Chunk& chunk) {
+    os << "Chunk Length: " << chunk.length << std::endl;
+    os << "Chunk Type: " << std::string(chunk.chunk_type.data(), chunk.chunk_type.size()) << std::endl;
+    os << "Chunk Data Size: " << chunk.data.size() << " bytes" << std::endl;
+    os << "Chunk CRC: ";
+    for (const auto& byte : chunk.crc) {
+        os << std::hex << std::to_integer<int>(byte) << " ";
+    }
+    os << std::dec << std::endl;
+
+    return os;
+}
