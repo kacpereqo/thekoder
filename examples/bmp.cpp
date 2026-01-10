@@ -1,0 +1,62 @@
+//
+// Created by debilian on 10.01.2026.
+//
+
+#include <cstddef>
+#include <fstream>
+#include <iostream>
+#include <vector>
+
+#include "logger/include/logger.hpp"
+#include "wav_codec.hpp"
+
+auto read_file_data(const std::string_view filename)
+{
+
+    std::ifstream filestream(filename.data(), std::ios::binary | std::ios::ate);
+
+    if (!filestream)
+    {
+
+        Logger::debug() << "Failed to open file " << filename;
+        std::exit(EXIT_FAILURE);
+    }
+    Logger::info() << "Successfully opened file " << filename;
+
+    const std::streamsize size = filestream.tellg();
+
+    filestream.seekg(0, std::ios::beg);
+
+    std::vector<std::byte> image_data(size);
+
+    if (filestream.read(reinterpret_cast<char *>(image_data.data()), size))
+    {
+        Logger::debug() << "Image data read from file: " << filename << std::endl;
+    } else
+    {
+        Logger::debug() << "Failed to read image data from file: " << filename << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+
+    filestream.close();
+
+
+    return image_data;
+}
+
+int main()
+{
+    constexpr std::string_view filename = "../examples/all_gray.bmp";
+
+    auto image_data = read_file_data(filename);
+    auto image_data_cursor = image_data.data();
+
+    TheKoder::BMP::BMP bmp(image_data_cursor);
+
+    auto pixels = bmp.decode_to_rgba16();
+
+    for (auto x : pixels)
+    {
+        std::cout << x << std::endl;
+    }
+}

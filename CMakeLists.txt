@@ -8,6 +8,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
+find_package(SDL3 REQUIRED)
+
 project(${TARGET})
 
 include(cmake/fetch.cmake)
@@ -18,6 +20,8 @@ add_subdirectory(src/utils)
 
 add_executable(${TARGET}
         src/main.cpp
+        src/codecs/wav/include/wav_codec.hpp
+        src/codecs/wav/wav_codec.cpp
 )
 
 target_compile_options(${TARGET} PRIVATE -g -O0 -fno-omit-frame-pointer)
@@ -30,9 +34,6 @@ target_link_libraries(${TARGET} PUBLIC
         logger
 )
 
-
 target_include_directories(zlibstatic INTERFACE ${zlib_SOURCE_DIR} ${zlib_BINARY_DIR})
-
-
-target_link_libraries(${TARGET} PUBLIC zlib)
+target_link_libraries(${TARGET} PRIVATE SDL3::SDL3-static)
 

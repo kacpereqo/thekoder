@@ -7,6 +7,8 @@
 #include <vector>
 #include "colors.hpp"
 
+using ImageCursor = std::byte *&;
+using DataCursor = std::byte *&;
 
 class Codec
 {

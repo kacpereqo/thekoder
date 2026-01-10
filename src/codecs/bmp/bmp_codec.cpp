@@ -1,6 +1,6 @@
 #include <utility>
 
-#include "bmp_codec.hpp"
+#include "wav_codec.hpp"
 
 using namespace TheKoder::BMP;
 using namespace TheKoder::BMP::Chunks;
