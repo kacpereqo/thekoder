@@ -1,11 +1,10 @@
-set(TARGET png_codec)
+set(TARGET bmp_codec)
 
 add_library(${TARGET}
-        png_codec.cpp
-        include/png.hpp
+        bmp_codec.cpp
+        include/bmp.hpp
+        include/utils.h
 )
 
 target_link_libraries(${TARGET} PUBLIC base_codec logger zlibstatic)
-
-
 target_include_directories(${TARGET} PUBLIC include)

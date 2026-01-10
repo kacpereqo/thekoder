@@ -19,12 +19,14 @@ add_executable(${TARGET}
         src/main.cpp
         src/utils.hpp
         src/utils.cpp
+        examples/png.cpp
 )
 
 target_compile_options(${TARGET} PRIVATE -g -O0 -fno-omit-frame-pointer)
 
 target_link_libraries(${TARGET} PUBLIC
         png_codec
+        bmp_codec
         base_codec
         logger
 )

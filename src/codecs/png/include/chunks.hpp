@@ -4,17 +4,18 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string_view>
 #include <array>
-#include <vector>
+#include <cstdint>
 #include <cstring>
+#include <string_view>
+#include <vector>
 
-#include "logger.hpp"
 #include "constants.hpp"
+#include "logger.hpp"
 
-template <typename T>
- T read_numerical_value(std::byte*& cursor) {
+template<typename T>
+T read_numerical_value(std::byte *&cursor)
+{
     T value{};
     std::memcpy(&value, cursor, sizeof(T));
 
@@ -25,8 +26,9 @@ template <typename T>
     return value;
 }
 
-template <typename T>
- T read_array_value(std::byte*& cursor) {
+template<typename T>
+T read_array_value(std::byte *&cursor)
+{
     T value{};
     std::memcpy(&value, cursor, sizeof(T));
 
@@ -36,22 +38,26 @@ template <typename T>
 }
 
 
-struct Chunk {
+struct Chunk
+{
     uint32_t length{};
     std::array<char, 4> chunk_type{};
     std::vector<std::byte> data;
-    std::array<std::byte,4 > crc{};
+    std::array<std::byte, 4> crc{};
 
-    size_t size() {
+    size_t size()
+    {
         return sizeof(length) + sizeof(chunk_type) + data.size() + sizeof(crc);
     }
 
-    [[nodiscard]] std::string_view chunk_type_str() const {
+    [[nodiscard]] std::string_view chunk_type_str() const
+    {
         return {chunk_type.data(), chunk_type.size()};
     }
 };
 
-struct IHDRData {
+struct IHDRData
+{
     uint32_t width;
     uint32_t height;
     uint8_t bit_depth;
@@ -61,8 +67,9 @@ struct IHDRData {
     uint8_t interlace_method;
 
     IHDRData() = default;
-    explicit IHDRData(Chunk&& chunk) {
-        std::byte* cursor = chunk.data.data();
+    explicit IHDRData(Chunk &&chunk)
+    {
+        std::byte *cursor = chunk.data.data();
 
         width = read_numerical_value<uint32_t>(cursor);
         height = read_numerical_value<uint32_t>(cursor);
@@ -83,16 +90,17 @@ struct IHDRData {
     }
 };
 
-struct SRGBData {
+struct SRGBData
+{};
 
-};
-
-struct GAMAData {
+struct GAMAData
+{
     uint32_t gamma{};
 
     GAMAData() = default;
-    explicit GAMAData(Chunk&& chunk) {
-        std::byte* cursor = chunk.data.data();
+    explicit GAMAData(Chunk &&chunk)
+    {
+        std::byte *cursor = chunk.data.data();
 
         gamma = read_numerical_value<uint32_t>(cursor);
 
@@ -101,14 +109,16 @@ struct GAMAData {
     }
 };
 
-struct PHYSData {
+struct PHYSData
+{
     uint32_t pixels_per_unit_x{};
     uint32_t pixels_per_unit_y{};
     uint8_t unit{};
 
     PHYSData() = default;
-    explicit PHYSData(Chunk&& chunk) {
-        std::byte* cursor = chunk.data.data();
+    explicit PHYSData(Chunk &&chunk)
+    {
+        std::byte *cursor = chunk.data.data();
 
         pixels_per_unit_x = read_numerical_value<uint32_t>(cursor);
         pixels_per_unit_y = read_numerical_value<uint32_t>(cursor);
@@ -121,15 +131,18 @@ struct PHYSData {
     }
 };
 
-struct IDATData {
+struct IDATData
+{
     std::vector<std::byte> compressed_data;
     IDATData() = default;
-    IDATData(Chunk&& chunk) {
+    IDATData(Chunk &&chunk)
+    {
         compressed_data = std::move(chunk.data);
     }
 };
 
-inline std::vector<std::byte> read_bytes(std::byte*& cursor, const size_t n) {
+inline std::vector<std::byte> read_bytes(std::byte *&cursor, const size_t n)
+{
     std::vector<std::byte> result;
     result.resize(n);
     std::memcpy(result.data(), cursor, n);
@@ -138,21 +151,24 @@ inline std::vector<std::byte> read_bytes(std::byte*& cursor, const size_t n) {
     return result;
 }
 
-inline Chunk read_chunk(std::byte*& cursor) {
+inline Chunk read_chunk(std::byte *&cursor)
+{
     const auto length = read_numerical_value<uint32_t>(cursor);
-    const auto chunk_type = read_array_value<std::array<char,4>>(cursor);
+    const auto chunk_type = read_array_value<std::array<char, 4>>(cursor);
     const auto data = read_bytes(cursor, length);
-    const auto crc = read_array_value<std::array<std::byte,4>>(cursor);
+    const auto crc = read_array_value<std::array<std::byte, 4>>(cursor);
 
     return {length, chunk_type, data, crc};
 }
 
-inline std::ostream &operator<<(std::ostream& os, const Chunk& chunk) {
+inline std::ostream &operator<<(std::ostream &os, const Chunk &chunk)
+{
     os << "Chunk Length: " << chunk.length << std::endl;
     os << "Chunk Type: " << std::string(chunk.chunk_type.data(), chunk.chunk_type.size()) << std::endl;
     os << "Chunk Data Size: " << chunk.data.size() << " bytes" << std::endl;
     os << "Chunk CRC: ";
-    for (const auto& byte : chunk.crc) {
+    for (const auto &byte : chunk.crc)
+    {
         os << std::hex << std::to_integer<int>(byte) << " ";
     }
     os << std::dec << std::endl;

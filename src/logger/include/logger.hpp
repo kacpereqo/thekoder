@@ -2,35 +2,43 @@
 
 #include <iostream>
 
-class Logger{
+class Logger
+{
 
 public:
-    static std::ostream& debug() {
+    static std::ostream &debug()
+    {
         return log(DEBUG);
     }
-    static std::ostream& info() {
+    static std::ostream &info()
+    {
         return log(INFO);
     }
-    static std::ostream& warning() {
+    static std::ostream &warning()
+    {
         return log(WARNING);
     }
-    static std::ostream& error() {
+    static std::ostream &error()
+    {
         return log(ERROR);
     }
 
 
 private:
-    enum Level {
+    enum Level
+    {
         DEBUG,
         INFO,
         WARNING,
         ERROR
     };
 
-    static std::ostream& log(const Level level) {
-        std::ostream& output = std::cout;
+    static std::ostream &log(const Level level)
+    {
+        std::ostream &output = std::cout;
 
-        switch (level) {
+        switch (level)
+        {
             case DEBUG:
                 output << "[DEBUG] ";
                 break;
@@ -46,5 +54,4 @@ private:
         }
         return output;
     }
-
 };
