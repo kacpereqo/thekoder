@@ -5,17 +5,21 @@
 #pragma once
 
 #include <vector>
+#include "colors.hpp"
+
 
 class Codec
 {
-
 public:
-    using data_cursor = std::byte *&;
-
-    virtual auto decode(std::byte *&cursor) -> std::vector<std::byte>;
-
-    virtual auto is_valid() -> bool;
-    virtual auto is_signature_valid() -> bool;
-
     virtual ~Codec() = default;
+
+    [[nodiscard]] auto is_signature_valid() const -> bool;
+
+    [[nodiscard]] auto virtual decode_to_rgb8()   const -> std::vector<RGB8>;
+    [[nodiscard]] auto virtual decode_to_rgba8()  const -> std::vector<RGBA8>;
+    [[nodiscard]] auto virtual decode_to_rgb16()  const -> std::vector<RGB16>;
+    [[nodiscard]] auto virtual decode_to_rgba16() const -> std::vector<RGBA16>;
+
+    [[nodiscard]] auto virtual get_width() const -> std::size_t;
+    [[nodiscard]] auto virtual get_height() const -> std::size_t;
 };

@@ -6,26 +6,35 @@
 
 #include "chunks.hpp"
 #include "codec.hpp"
-#include "constants.hpp"
 #include "colors.hpp"
 
-class BMP
+namespace TheKoder::BMP
 {
-public:
-    explicit BMP(ImageCursor cursor);
 
-    FileHeader header;
-    InfoHeader info_header;
-    ColorTable color_table;
-    std::span<std::byte> data;
+    class BMP
+    {
 
-    auto decode_to_rgb8() -> std::vector<RGB8>;
-    auto decode_to_rgba8() -> std::vector<RGBA8>;
-    auto decode_to_rgb16() -> std::vector<RGB16>;
-    auto decode_to_rgba16() -> std::vector<RGBA16>;
+    public:
+        explicit BMP(ImageCursor cursor);
 
-private:
-    template<typename T>
-    auto decode() -> std::vector<T>;
+        [[nodiscard]] auto is_signature_valid() const -> bool;
 
-};
+        [[nodiscard]] auto decode_to_rgb8()   const -> std::vector<RGB8>;
+        [[nodiscard]] auto decode_to_rgba8()  const -> std::vector<RGBA8>;
+        [[nodiscard]] auto decode_to_rgb16()  const -> std::vector<RGB16>;
+        [[nodiscard]] auto decode_to_rgba16() const -> std::vector<RGBA16>;
+
+        [[nodiscard]] auto get_width() const -> std::size_t;
+        [[nodiscard]] auto get_height() const -> std::size_t;
+
+    private:
+        Chunks::FileHeader header;
+        Chunks::InfoHeader info_header;
+        Chunks::ColorTable color_table;
+        std::span<std::byte> data;
+
+        template<typename T>
+        auto decode() const ->  std::vector<T>;
+
+    };
+}

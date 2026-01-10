@@ -48,7 +48,7 @@ int main()
     auto image_data = read_file_data(filename);
     auto image_data_cursor = image_data.data();
 
-    BMP bmp(image_data_cursor);
+    TheKoder::BMP::BMP bmp(image_data_cursor);
 
     auto pixels = bmp.decode_to_rgba16();
 

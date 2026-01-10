@@ -4,15 +4,11 @@
 
 #pragma once
 
-#include <array>
-#include <cstdint>
 #include <cstring>
-#include <string_view>
-
-#include <bit>          // std::byteswap
-#include <cstring>      // std::memcpy
-#include <type_traits>  // std::is_enum_v, std::underlying_type_t
-#include <cstddef>      // std::byte
+#include <bit>
+#include <cstring>
+#include <type_traits>
+#include <cstddef>
 
 template<typename T, std::endian ENDIANNESS = std::endian::little>
 T read_numerical_value(std::byte *&cursor)

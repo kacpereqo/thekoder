@@ -1,101 +1,51 @@
-//
-// Created by remza on 28.12.2025.
-//
-
 #pragma once
 
 #include <array>
 #include <cstdint>
-#include <cstring>
-#include <string_view>
-#include <vector>
+#include <cstddef> // for std::byte
+#include <span>
 
 #include "colors.hpp"
-#include "constants.hpp"
-#include "logger.hpp"
-#include "utils.h"
+#include "enums.hpp"
 
 using ImageCursor = std::byte *&;
+using namespace TheKoder::BMP::Enums;
 
-enum class BitsPerPixel : uint16_t
+namespace TheKoder::BMP::Chunks
 {
-    monochrome = 1,
-    palette_4 = 4,
-    palette_8 = 8,
-    palette_16 = 16,
-    palette_24 = 24
-};
-
-enum class CompressionType : uint32_t
-{
-    RGB = 0,
-    RLE8 = 1,
-    RLE4 = 2,
-};
-
-struct FileHeader
-{
-    std::array<char, 2> signature{};
-    uint32_t file_size{};
-    std::array<std::byte, 4> reserved{};
-    uint32_t offset{};
-
-    explicit FileHeader(ImageCursor cursor)
+    struct FileHeader
     {
-        this->signature = read_array_value<std::array<char, 2>>(cursor);
-        this->file_size = read_numerical_value<uint32_t>(cursor);
-        cursor += sizeof(this->file_size);
-        this->offset = read_numerical_value<uint32_t>(cursor);
-    }
-};
+        std::array<char, 2> signature{};
+        uint32_t file_size{};
+        std::array<std::byte, 4> reserved{};
+        uint32_t offset{};
 
-struct InfoHeader
-{
-    uint32_t size{};
-    uint32_t width{};
-    uint32_t height{};
-    uint16_t planes{};
-    BitsPerPixel bits_per_pixel{};
-    CompressionType compression{};
-    uint32_t image_size{};
-    uint32_t x_pixels_per_m{};
-    uint32_t y_pixels_per_m{};
-    uint32_t color_used{};
-    uint32_t important_colors{};
+        explicit FileHeader(ImageCursor cursor);
+    };
 
-    explicit InfoHeader(ImageCursor cursor)
+    struct InfoHeader
     {
-        this->size = read_numerical_value<uint32_t>(cursor);
-        this->width = read_numerical_value<uint32_t>(cursor);
-        this->height = read_numerical_value<uint32_t>(cursor);
-        this->planes = read_numerical_value<uint16_t>(cursor);
-        this->bits_per_pixel = read_numerical_value<BitsPerPixel>(cursor);
-        this->compression = read_numerical_value<CompressionType>(cursor);
-        this->image_size = read_numerical_value<uint32_t>(cursor);
-        this->x_pixels_per_m = read_numerical_value<uint32_t>(cursor);
-        this->y_pixels_per_m = read_numerical_value<uint32_t>(cursor);
-        this->color_used = read_numerical_value<uint32_t>(cursor);
-        this->important_colors = read_numerical_value<uint32_t>(cursor);
-    }
-};
+        uint32_t size{};
+        uint32_t width{};
+        uint32_t height{};
+        uint16_t planes{};
+        BitsPerPixel bits_per_pixel{};
+        CompressionType compression{};
+        uint32_t image_size{};
+        uint32_t x_pixels_per_m{};
+        uint32_t y_pixels_per_m{};
+        uint32_t color_used{};
+        uint32_t important_colors{};
 
-struct ColorTable
-{
-    std::span<RGBA8> colors;
+        explicit InfoHeader(ImageCursor cursor);
+    };
 
-    explicit ColorTable(ImageCursor cursor)
+    struct ColorTable
     {
-        constexpr uint32_t COLOR_TABLE_SIZE = 256 * 4;
+        std::span<RGBA8> colors;
+        explicit ColorTable(ImageCursor cursor, uint32_t color_count = 256);
 
-        this->colors = std::span(reinterpret_cast<RGBA8*>(cursor) , COLOR_TABLE_SIZE);
-        cursor += COLOR_TABLE_SIZE;
-    }
+        ColorTable() = default;
+    };
 
-    ColorTable() = default;
-};
-
-struct PixelData
-{
-
-};
-
+}
