@@ -36,7 +36,7 @@ auto BMP::decode_to_rgba16() const -> std::vector<RGBA16>
 }
 
 template<typename T>
-auto BMP::decode() const ->  std::vector<T>
+auto BMP::decode() const -> std::vector<T>
 {
     const auto image_size = this->info_header.width * this->info_header.height;
     std::vector<T> pixels(image_size);
@@ -55,9 +55,12 @@ auto BMP::decode() const ->  std::vector<T>
                 pixels[i] = static_cast<T>(pixel);
                 break;
             }
-            case BitsPerPixel::rgb_16: break;
-            case BitsPerPixel::rgb_24: break;
-            case BitsPerPixel::rgb_32: break;
+            case BitsPerPixel::rgb_16:
+                break;
+            case BitsPerPixel::rgb_24:
+                break;
+            case BitsPerPixel::rgb_32:
+                break;
         }
     }
 

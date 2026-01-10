@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include <cstring>
 #include <bit>
+#include <cstddef>
 #include <cstring>
 #include <type_traits>
-#include <cstddef>
 
 template<typename T, std::endian ENDIANNESS = std::endian::little>
 T read_numerical_value(std::byte *&cursor)

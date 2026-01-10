@@ -19,9 +19,9 @@ namespace TheKoder::BMP
 
         [[nodiscard]] auto is_signature_valid() const -> bool;
 
-        [[nodiscard]] auto decode_to_rgb8()   const -> std::vector<RGB8>;
-        [[nodiscard]] auto decode_to_rgba8()  const -> std::vector<RGBA8>;
-        [[nodiscard]] auto decode_to_rgb16()  const -> std::vector<RGB16>;
+        [[nodiscard]] auto decode_to_rgb8() const -> std::vector<RGB8>;
+        [[nodiscard]] auto decode_to_rgba8() const -> std::vector<RGBA8>;
+        [[nodiscard]] auto decode_to_rgb16() const -> std::vector<RGB16>;
         [[nodiscard]] auto decode_to_rgba16() const -> std::vector<RGBA16>;
 
         [[nodiscard]] auto get_width() const -> std::size_t;
@@ -34,7 +34,6 @@ namespace TheKoder::BMP
         std::span<std::byte> data;
 
         template<typename T>
-        auto decode() const ->  std::vector<T>;
-
+        auto decode() const -> std::vector<T>;
     };
-}
+} // namespace TheKoder::BMP

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <array>
-#include <cstdint>
 #include <cstddef> // for std::byte
+#include <cstdint>
 #include <span>
 
 #include "colors.hpp"
@@ -48,4 +48,4 @@ namespace TheKoder::BMP::Chunks
         ColorTable() = default;
     };
 
-}
+} // namespace TheKoder::BMP::Chunks

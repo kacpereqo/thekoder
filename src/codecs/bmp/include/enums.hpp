@@ -25,4 +25,4 @@ namespace TheKoder::BMP::Enums
         RLE4 = 2,
         BITFIELDS = 3
     };
-}
+} // namespace TheKoder::BMP::Enums

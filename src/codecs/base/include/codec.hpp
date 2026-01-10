@@ -15,9 +15,9 @@ public:
 
     [[nodiscard]] auto is_signature_valid() const -> bool;
 
-    [[nodiscard]] auto virtual decode_to_rgb8()   const -> std::vector<RGB8>;
-    [[nodiscard]] auto virtual decode_to_rgba8()  const -> std::vector<RGBA8>;
-    [[nodiscard]] auto virtual decode_to_rgb16()  const -> std::vector<RGB16>;
+    [[nodiscard]] auto virtual decode_to_rgb8() const -> std::vector<RGB8>;
+    [[nodiscard]] auto virtual decode_to_rgba8() const -> std::vector<RGBA8>;
+    [[nodiscard]] auto virtual decode_to_rgb16() const -> std::vector<RGB16>;
     [[nodiscard]] auto virtual decode_to_rgba16() const -> std::vector<RGBA16>;
 
     [[nodiscard]] auto virtual get_width() const -> std::size_t;
