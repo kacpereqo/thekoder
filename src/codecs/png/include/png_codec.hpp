@@ -6,78 +6,41 @@
 
 #include "chunks.hpp"
 #include "codec.hpp"
+#include "colors.hpp"
 #include "constants.hpp"
-
-struct ColorRGB
-{
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-
-    ColorRGB() = default;
-
-    ColorRGB(const uint8_t r, const uint8_t g, const uint8_t b) : r(r), g(g), b(b)
-    {}
-
-    ColorRGB(const std::byte r, const std::byte g, const std::byte b) :
-        r(std::to_integer<uint8_t>(r)), g(std::to_integer<uint8_t>(g)), b(std::to_integer<uint8_t>(b))
-    {}
-
-    ColorRGB operator-(const ColorRGB rhs) const
-    {
-        const uint8_t new_r = this->r - rhs.r;
-        const uint8_t new_g = this->b - rhs.g;
-        const uint8_t new_b = this->b - rhs.b;
-
-        return {new_r, new_g, new_b};
-    }
-
-    friend std::ostream &operator<<(std::ostream &str, const ColorRGB &c)
-    {
-        str << "RGB( r=" << static_cast<int>(c.r) << ", g=" << static_cast<int>(c.g) << ", b=" << static_cast<int>(c.b)
-            << ")";
-        return str;
-    }
-};
 
 class PngCodec
 {
 public:
-    auto decode_to_rgb(std::byte *&cursor) -> std::vector<ColorRGB>;
-    auto decode(std::byte *&cursor) -> std::vector<std::byte>;
+    auto decode_to_rgb8() -> std::vector<RGB8>;
+    auto decode_to_rgba8() -> std::vector<RGBA8>;
+    auto decode_to_rgb16() -> std::vector<RGB16>;
+    auto decode_to_rgba16() -> std::vector<RGBA16>;
+    [[nodiscard]] auto decode_raw() const -> std::vector<std::byte>;
 
-    [[nodiscard]] IHDRData get_ihdr() const
-    {
-        return ihdr;
-    }
+    explicit PngCodec(ImageCursor cursor);
 
-    [[nodiscard]] GAMAData get_gama() const
-    {
-        return gama;
-    }
+    std::byte* zero_cursor;
+    PNGSignature signature;
+    Ihdr ihdr;
+    Gama gama{};
+    Phys phys{};
+    Idat idat{};
 
-    [[nodiscard]] PHYSData get_phys() const
-    {
-        return phys;
-    }
-
-    [[nodiscard]] IDATData get_idat() const
-    {
-        return idat;
-    }
-
-    static auto is_signature_valid(std::byte *&cursor) -> bool;
+    uint8_t bytes_per_pixel{};
 
 private:
-    IHDRData ihdr{};
-    GAMAData gama{};
-    PHYSData phys{};
-    IDATData idat{};
+    auto transform_2d_to_1d(uint32_t x, uint32_t y) const -> uint32_t;
 
-    static auto apply_filter_sub(std::span<ColorRGB> &row) -> void;
-    auto apply_filter_up(std::span<ColorRGB> &row, std::span<ColorRGB> &up_row) const -> void;
-    auto apply_filter_avg(std::span<ColorRGB> &row, std::span<ColorRGB> &up_row, std::span<ColorRGB> &down_row) const
-            -> void;
-    auto apply_filter_paeth(std::span<ColorRGB> &row, std::span<ColorRGB> &up_row, std::span<ColorRGB> &down_row) const
-            -> void;
+    auto filter_sub(std::span<std::byte> row) const -> void;
+    auto filter_up(std::span<std::byte> row, std::span<std::byte> up_row) const -> void;
+    auto filter_average(std::span<std::byte> row, std::span<std::byte> up_row) const -> void;
+    auto filter_paeth(std::span<std::byte> row, std::span<std::byte> up_row) const -> void;
+
+    // static auto apply_filter_sub(std::span<ColorRGB> &row) -> void;
+    // auto apply_filter_up(std::span<ColorRGB> &row, std::span<ColorRGB> &up_row) const -> void;
+    // auto apply_filter_avg(std::span<ColorRGB> &row, std::span<ColorRGB> &up_row, std::span<ColorRGB> &down_row) const
+            // -> void;
+    // auto apply_filter_paeth(std::span<ColorRGB> &row, std::span<ColorRGB> &up_row, std::span<ColorRGB> &down_row) const
+            // -> void;
 };

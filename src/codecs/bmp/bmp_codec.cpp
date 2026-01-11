@@ -5,9 +5,11 @@
 using namespace TheKoder::BMP;
 using namespace TheKoder::BMP::Chunks;
 
-BMP::BMP(ImageCursor cursor) :  header(cursor), info_header(cursor)
+BMP::BMP(ImageCursor cursor) : header(cursor), info_header(cursor)
 {
-    if (const auto bits_per_pixel = this->info_header.bits_per_pixel; bits_per_pixel == BitsPerPixel::monochrome || bits_per_pixel == BitsPerPixel::palette_4 || bits_per_pixel == BitsPerPixel::palette_8)
+    if (const auto bits_per_pixel = this->info_header.bits_per_pixel; bits_per_pixel == BitsPerPixel::monochrome ||
+                                                                      bits_per_pixel == BitsPerPixel::palette_4 ||
+                                                                      bits_per_pixel == BitsPerPixel::palette_8)
     {
         this->color_table = ColorTable{cursor};
     }
@@ -41,27 +43,29 @@ auto BMP::decode() const -> std::vector<T>
     const auto image_size = this->info_header.width * this->info_header.height;
     std::vector<T> pixels(image_size);
 
-    for (int i = 0; i < image_size; i++)
+    switch (this->info_header.bits_per_pixel)
     {
-        switch (this->info_header.bits_per_pixel)
-        {
-            case BitsPerPixel::monochrome: break;
-            case BitsPerPixel::palette_4: break;
-            case BitsPerPixel::palette_8:
+        case BitsPerPixel::monochrome:
+            break;
+        case BitsPerPixel::palette_4:
+            break;
+        case BitsPerPixel::palette_8:
             {
-                RGBA8 pixel {this->color_table.colors[std::to_underlying(this->data[i])]};
-                pixel.a = 255;
+                for (int i = 0; i < image_size; i++)
+                {
+                    RGBA8 pixel{this->color_table.colors[std::to_underlying(this->data[i])]};
+                    pixel.a = 255;
 
-                pixels[i] = static_cast<T>(pixel);
+                    pixels[i] = static_cast<T>(pixel);
+                }
                 break;
             }
-            case BitsPerPixel::rgb_16:
-                break;
-            case BitsPerPixel::rgb_24:
-                break;
-            case BitsPerPixel::rgb_32:
-                break;
-        }
+        case BitsPerPixel::rgb_16:
+            break;
+        case BitsPerPixel::rgb_24:
+            break;
+        case BitsPerPixel::rgb_32:
+            break;
     }
 
     return pixels;
