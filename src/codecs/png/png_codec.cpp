@@ -5,10 +5,10 @@
 #include "include/png_codec.hpp"
 #include "include/constants.hpp"
 
+#include <cmath>
 #include <memory>
 #include <utility>
 #include <zlib.h>
-#include <cmath>
 
 inline void skip_chunk(ImageCursor cursor)
 {
@@ -147,8 +147,7 @@ auto PngCodec::decode_raw() const -> std::vector<std::byte>
                 {
                     const std::span upper_row{&pixels[transform_2d_to_1d(1, row - 1)],
                                               this->ihdr.width * bytes_per_pixel};
-                this->filter_up(row_data, upper_row);
-
+                    this->filter_up(row_data, upper_row);
                 }
             case FilterType::Average:
                 //  Average(x) + floor( (Raw(x-bpp) + Prior(x))/2 )
@@ -163,7 +162,7 @@ auto PngCodec::decode_raw() const -> std::vector<std::byte>
                         const auto a = std::to_integer<uint8_t>(row_data[i - bytes_per_pixel]);
                         const auto b = std::to_integer<uint8_t>(upper_row[i]);
 
-                        row_data[i] = static_cast<std::byte>(x + std::floor(a + b/2));
+                        row_data[i] = static_cast<std::byte>(x + std::floor(a + b / 2));
                     }
                     break;
                 }

@@ -20,7 +20,7 @@ public:
 
     explicit PngCodec(ImageCursor cursor);
 
-    std::byte* zero_cursor;
+    std::byte *zero_cursor;
     PNGSignature signature;
     Ihdr ihdr;
     Gama gama{};
@@ -40,7 +40,8 @@ private:
     // static auto apply_filter_sub(std::span<ColorRGB> &row) -> void;
     // auto apply_filter_up(std::span<ColorRGB> &row, std::span<ColorRGB> &up_row) const -> void;
     // auto apply_filter_avg(std::span<ColorRGB> &row, std::span<ColorRGB> &up_row, std::span<ColorRGB> &down_row) const
-            // -> void;
-    // auto apply_filter_paeth(std::span<ColorRGB> &row, std::span<ColorRGB> &up_row, std::span<ColorRGB> &down_row) const
-            // -> void;
+    // -> void;
+    // auto apply_filter_paeth(std::span<ColorRGB> &row, std::span<ColorRGB> &up_row, std::span<ColorRGB> &down_row)
+    // const
+    // -> void;
 };

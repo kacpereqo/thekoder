@@ -49,7 +49,7 @@ int main()
 
     PngCodec png(data_cursor);
     auto pixels = png.decode_raw();
-    for (auto x: pixels)
+    for (auto x : pixels)
     {
         std::cout << std::to_integer<int>(x) << std::endl;
     }
