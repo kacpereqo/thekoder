@@ -1,21 +1,15 @@
 //
-// Created by debilian on 10.01.2026.
+// Created by debilian on 14.01.2026.
 //
 
 #pragma once
-#include <array>
-#include <cstdint>
-#include <span>
 
+#include <array>
+#include "../enums.hpp"
 #include "codec.hpp"
 #include "utils/reading_value.hpp"
 
-enum class BitsPerSample : uint16_t
-{
-    bits_8 = 8,
-    bits_16 = 16
-};
-
+namespace TheKoder::WAV::Chunks{
 struct Riff
 {
     std::array<char,4> chunk_id{};
@@ -39,7 +33,7 @@ struct Fmt
     uint32_t sample_rate;
     uint32_t byte_rate;
     uint16_t block_align;
-    BitsPerSample bits_per_sample;
+    Enums::BitsPerSample bits_per_sample;
 
     explicit Fmt(DataCursor cursor)
     {
@@ -50,7 +44,7 @@ struct Fmt
         this->sample_rate = read_numerical_value<uint32_t>(cursor);
         this->byte_rate = read_numerical_value<uint32_t>(cursor);
         this->block_align = read_numerical_value<uint16_t>(cursor);
-        this->bits_per_sample = read_numerical_value<BitsPerSample>(cursor);
+        this->bits_per_sample = read_numerical_value<Enums::BitsPerSample>(cursor);
     }
 };
 
@@ -67,21 +61,4 @@ struct Data
         this->data = std::span(cursor, size);
     }
 };
-
-class WAV
-{
-public:
-    Riff riff;
-    Fmt fmt;
-    Data data;
-
-    auto decode_8bit() -> std::vector<uint8_t>;
-    auto decode_16bit() -> std::vector<uint16_t>;
-
-    explicit WAV(DataCursor cursor) : riff(cursor), fmt(cursor), data(cursor)
-    {}
-
-private:
-    template<typename T>
-    auto decode() -> std::vector<T>;
-};
+}
