@@ -1,7 +1,7 @@
-set(TARGET png_codec)
+set(TARGET gif_codec)
 
 add_library(${TARGET}
-        png_codec.cpp
+        gif_codec.cpp
 )
 
 target_link_libraries(${TARGET} PUBLIC base_codec logger zlibstatic utils)

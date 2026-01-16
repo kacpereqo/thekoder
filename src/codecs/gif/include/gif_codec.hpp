@@ -5,11 +5,12 @@
 #pragma once
 
 #include "chunks.hpp"
-#include "codec.hpp"
-#include "colors.hpp"
 #include "constants.hpp"
 
 class GIF
 {
-
+public:
+    Signature signature;
+    LogicalScreenDescriptor logical_screen_descriptor;
+    GlobalColorTable global_color_table;
 };

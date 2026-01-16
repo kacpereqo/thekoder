@@ -5,7 +5,7 @@
 #pragma once
 
 #include <array>
-#include "../enums.hpp"
+#include "wav/enums.hpp"
 #include "codec.hpp"
 #include "utils/reading_value.hpp"
 

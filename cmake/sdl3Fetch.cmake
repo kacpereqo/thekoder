@@ -1,9 +1,9 @@
 include(FetchContent)
 
 FetchContent_Declare(
-        zlib
-        GIT_REPOSITORY https://github.com/madler/zlib.git
-        GIT_TAG        v1.3
+        SDL3
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+        GIT_TAG        release-3.2.28
 )
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static zlib" FORCE)
-FetchContent_MakeAvailable(zlib)
+set(SDL_STATIC ON CACHE BOOL "Build SDL3 static library" FORCE)
+FetchContent_MakeAvailable(SDL3)

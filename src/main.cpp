@@ -42,16 +42,9 @@ auto read_file_data(const std::string_view filename)
 
 int main()
 {
-    constexpr std::string_view filename = "../examples/sample1.png";
+    constexpr std::string_view filename = "../examples/snake.gif";
 
     auto image_data = read_file_data(filename);
     auto data_cursor = image_data.data();
-
-    PngCodec png(data_cursor);
-    auto pixels = png.decode_raw();
-    for (auto x : pixels)
-    {
-        std::cout << std::to_integer<int>(x) << std::endl;
-    }
 
 }
